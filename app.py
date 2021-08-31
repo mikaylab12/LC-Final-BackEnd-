@@ -15,7 +15,7 @@ from datetime import timedelta
 # initializing the database
 class Database(object):
     def __init__(self):
-        self.conn = sqlite3.connect('shop.db')
+        self.conn = sqlite3.connect('adoption_centre.db')
         self.cursor = self.conn.cursor()
 
     # to commit multiple things
@@ -47,7 +47,7 @@ class User(object):
 
 # create user table
 def init_user_table():
-    conn = sqlite3.connect('shop.db')
+    conn = sqlite3.connect('adoption_centre.db')
     cursor = conn.cursor()
     print("Opened database successfully")
     cursor.execute("CREATE TABLE IF NOT EXISTS users "
@@ -257,7 +257,7 @@ def user_login():
     if request.method == "POST":
         username = request.json['username']
         password = request.json['password']
-        conn = sqlite3.connect("shop.db")
+        conn = sqlite3.connect("adoption_centre.db")
         cur = conn.cursor()
         query = f"SELECT * FROM users WHERE username= '{username}' and password = '{password}'"
         db.single_commit(query)
@@ -333,7 +333,7 @@ class Admin(object):
 
 # create admin table
 def init_admin_table():
-    conn = sqlite3.connect('shop.db')
+    conn = sqlite3.connect('adoption_centre.db')
     cursor = conn.cursor()
     print("Opened database successfully")
     cursor.execute("CREATE TABLE IF NOT EXISTS admin "
@@ -435,7 +435,7 @@ def admin_login():
     if request.method == "POST":
         username = request.json['admin_username']
         password = request.json['admin_password']
-        conn = sqlite3.connect("shop.db")
+        conn = sqlite3.connect("adoption_centre.db")
         cur = conn.cursor()
         query = f"SELECT * FROM admin WHERE admin_username= '{username}' and admin_password = '{password}'"
         db.single_commit(query)
@@ -477,7 +477,7 @@ def edit_user(user_number):
     db = Database()
 
     if request.method == "PUT":
-        with sqlite3.connect('shop.db'):
+        with sqlite3.connect('adoption_centre.db'):
             data_receive = dict(request.json)
             put_data = {}
 
@@ -601,7 +601,7 @@ def edit_animal(animal_number):
     db = Database()
 
     if request.method == "PUT":
-        with sqlite3.connect('shop.db'):
+        with sqlite3.connect('adoption_centre.db'):
             data_received = dict(request.json)
             put_data = {}
 
@@ -669,7 +669,7 @@ def edit_animal(animal_number):
 def view_profile(username):
     response = {}
     if request.method == "GET":
-        with sqlite3.connect("shop.db") as conn:
+        with sqlite3.connect("adoption_centre.db") as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM users WHERE username='" + username + "'")
             data = cursor.fetchall()
