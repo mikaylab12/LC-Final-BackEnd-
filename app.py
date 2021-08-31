@@ -275,12 +275,14 @@ def user_login():
 
 # creating animals object
 class Animals(object):
-    def __init__(self, animal_number, animal_name, animal_type, animal_breed, animal_price, animal_description,
-                 animal_image):
+    def __init__(self, animal_number, animal_name, animal_type, animal_breed, animal_age, animal_gender, animal_price,
+                 animal_description, animal_image):
         self.animal_number = animal_number
         self.animal_name = animal_name
         self.animal_type = animal_type
         self.animal_breed = animal_breed
+        self.animal_age = animal_age
+        self.animal_gender = animal_gender
         self.animal_price = animal_price
         self.animal_description = animal_description
         self.animal_image = animal_image
@@ -294,6 +296,8 @@ def init_animal_table():
              "animal_name TEXT NOT NULL, "
              "animal_type TEXT NOT NULL, "
              "animal_breed TEXT NOT NULL, "
+             "animal_age TEXT NOT NULL, "
+             "animal_gender TEXT NOT NULL, "
              "animal_price TEXT NOT NULL, "
              "animal_description TEXT NOT NULL, "
              "animal_image TEXT NOT NULL)")
@@ -451,7 +455,7 @@ def admin_login():
         return "Wrong Method"
 
 
-# route to show all products
+# route to show all users
 @app.route('/show-users/', methods=["GET"])
 def show_users():
     response = {}
@@ -563,16 +567,18 @@ def add_animal():
         name = request.json['animal_name']
         type = request.json['animal_type']
         breed = request.json['animal_breed']
+        age = request.json['animal_age']
+        gender = request.json['animal_gender']
         price = request.json['animal_price']
         description = request.json['animal_description']
         image = request.json['animal_image']
         # total = int(price) * int(quantity)
-        if name == '' or price == '' or type == '' or breed == '' or description == '' or image == '':
+        if name == '' or price == '' or type == '' or breed == '' or age == '' or gender == ''or description == '' or image == '':
             return "Please fill in all entry fields"
         else:
-            query = "INSERT INTO animals (animal_name, animal_type, animal_breed, animal_price, animal_description," \
-                    " animal_image) VALUES(?, ?, ?, ?, ?, ?)"
-            values = (name, type, breed, price, description, image)
+            query = "INSERT INTO animals (animal_name, animal_type, animal_breed, animal_age, animal_gender, " \
+                    "animal_price, animal_description, animal_image) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"
+            values = (name, type, breed, age, gender, price, description, image)
             db.to_commit(query, values)
 
             response["status_code"] = 201
@@ -628,6 +634,22 @@ def edit_animal(animal_number):
                 db.to_commit(query, values)
 
                 response["animal_breed"] = "Animal breed updated successfully"
+                response["status_code"] = 200
+            if data_received.get("animal_age") is not None:
+                put_data["animal_age"] = data_received.get("animal_age")
+                query = "UPDATE animals SET animal_age =? WHERE animal_number=?"
+                values = (put_data["animal_age"], animal_number)
+                db.to_commit(query, values)
+
+                response['animal_age'] = "Animal age update was successful."
+                response['status_code'] = 200
+            if data_received.get("animal_gender") is not None:
+                put_data['animal_gender'] = data_received.get('animal_gender')
+                query = "UPDATE animals SET animal_gender =? WHERE animal_number=?"
+                values = (put_data["animal_gender"], str(animal_number))
+                db.to_commit(query, values)
+
+                response["animal_gender"] = "Animal gender updated successfully"
                 response["status_code"] = 200
             if data_received.get("animal_price") is not None:
                 put_data['animal_price'] = data_received.get('animal_price')
@@ -692,6 +714,197 @@ def view_animal(animal_number):
     response["message_description"] = "Animal retrieved successfully"
     response["data"] = db.fetch_one()
     return response
+
+
+class Foster(object):
+    def __init__(self, foster_number, foster_name, foster_type, foster_breed, foster_age, foster_gender,
+                 foster_description, foster_image):
+        self.foster_number = foster_number
+        self.foster_name = foster_name
+        self.foster_type = foster_type
+        self.foster_breed = foster_breed
+        self.foster_age = foster_age
+        self.foster_gender = foster_gender
+        self.foster_description = foster_description
+        self.foster_image = foster_image
+        
+        
+# creating products table
+def init_foster_table():
+    db = Database()
+    query = ("CREATE TABLE IF NOT EXISTS foster "
+             "(foster_number INTEGER PRIMARY KEY AUTOINCREMENT, "
+             "foster_name TEXT NOT NULL, "
+             "foster_type TEXT NOT NULL, "
+             "foster_breed TEXT NOT NULL, "
+             "foster_age TEXT NOT NULL, "
+             "foster_gender TEXT NOT NULL, "
+             "foster_description TEXT NOT NULL, "
+             "foster_image TEXT NOT NULL)")
+    db.single_commit(query)
+    print("Foster table created successfully.")
+
+
+# calling function to create products table
+init_foster_table()
+
+
+# route to add a foster product
+@app.route('/add-foster/', methods=["POST"])
+# @jwt_required()
+def add_foster():
+    response = {}
+    db = Database()
+    if request.method == "POST":
+        name = request.json['foster_name']
+        type = request.json['foster_type']
+        breed = request.json['foster_breed']
+        age = request.json['foster_age']
+        gender = request.json['foster_gender']
+        description = request.json['foster_description']
+        image = request.json['foster_image']
+        if name == '' or type == '' or breed == '' or age == '' or gender == ''or description == '' or image == '':
+            return "Please fill in all entry fields"
+        else:
+            query = "INSERT INTO foster (foster_name, foster_type, foster_breed, foster_age, foster_gender, " \
+                    " foster_description, foster_image) VALUES(?, ?, ?, ?, ?, ?, ?)"
+            values = (name, type, breed, age, gender, description, image)
+            db.to_commit(query, values)
+
+            response["status_code"] = 201
+            response['description_message'] = "Foster animal added successfully"
+            return response
+
+
+# route to delete one foster product
+@app.route("/delete-foster/<int:foster_number>")
+# @jwt_required()
+def delete_foster(foster_number):
+    response = {}
+    db = Database()
+    query = "DELETE FROM foster WHERE foster_number=" + str(foster_number)
+    db.single_commit(query)
+    response['status_code'] = 200
+    response['message'] = "Foster animal deleted successfully."
+    return response
+
+
+# route to edit single foster product
+@app.route('/edit-foster/<int:foster_number>/', methods=["PUT"])
+# @jwt_required()
+def edit_foster(foster_number):
+    response = {}
+    db = Database()
+
+    if request.method == "PUT":
+        with sqlite3.connect('adoption_centre.db'):
+            data_received = dict(request.json)
+            put_data = {}
+
+            if data_received.get("foster_name") is not None:
+                put_data["foster_name"] = data_received.get("foster_name")
+                query = "UPDATE foster SET foster_name =? WHERE foster_number=?"
+                values = (put_data["foster_name"], foster_number)
+                db.to_commit(query, values)
+
+                response['foster_name'] = "Foster name update was successful."
+                response['status_code'] = 200
+            if data_received.get("foster_type") is not None:
+                put_data['foster_type'] = data_received.get('foster_type')
+                query = "UPDATE foster SET foster_type =? WHERE foster_number=?"
+                values = (put_data["foster_type"], str(foster_number))
+                db.to_commit(query, values)
+
+                response["foster_type"] = "Foster type updated successfully"
+                response["status_code"] = 200
+            if data_received.get("foster_breed") is not None:
+                put_data['foster_breed'] = data_received.get('foster_breed')
+                query = "UPDATE foster SET foster_breed =? WHERE foster_number=?"
+                values = (put_data["foster_breed"], str(foster_number))
+                db.to_commit(query, values)
+
+                response["foster_breed"] = "Foster breed updated successfully"
+                response["status_code"] = 200
+            if data_received.get("foster_age") is not None:
+                put_data["foster_age"] = data_received.get("foster_age")
+                query = "UPDATE foster SET foster_age =? WHERE foster_number=?"
+                values = (put_data["foster_age"],foster_number)
+                db.to_commit(query, values)
+
+                response['foster_age'] = "Foster age update was successful."
+                response['status_code'] = 200
+            if data_received.get("foster_gender") is not None:
+                put_data['foster_gender'] = data_received.get('foster_gender')
+                query = "UPDATE foster SET foster_gender =? WHERE foster_number=?"
+                values = (put_data["foster_gender"], str(foster_number))
+                db.to_commit(query, values)
+
+                response["foster_gender"] = "Foster gender updated successfully"
+                response["status_code"] = 200
+            # if data_received.get("animal_price") is not None:
+            #     put_data['animal_price'] = data_received.get('animal_price')
+            #     query = "UPDATE animals SET animal_price =? WHERE animal_number=?"
+            #     values = (put_data["animal_price"], str(animal_number))
+            #     db.to_commit(query, values)
+            #
+            #     response["animal_price"] = "Animal price updated successfully"
+            #     response["status_code"] = 200
+            if data_received.get("foster_description") is not None:
+                put_data['foster_description'] = data_received.get('foster_description')
+                query = "UPDATE foster SET foster_description =? WHERE foster_number=?"
+                values = (put_data["foster_description"], str(foster_number))
+                db.to_commit(query, values)
+
+                response["foster_description"] = "Foster description updated successfully"
+                response["status_code"] = 200
+            if data_received.get("foster_image") is not None:
+                put_data['foster_image'] = data_received.get('foster_image')
+                query = "UPDATE foster SET foster_image =? WHERE foster_number=?"
+                values = (put_data["foster_image"], str(foster_number))
+                db.to_commit(query, values)
+
+                response["foster_image"] = "Foster image updated successfully"
+                response["status_code"] = 200
+            # if data_received.get("total") is not None:
+            #     put_data['total'] = data_received.get('total')
+            #     query = "UPDATE animals SET total =? WHERE animal_number=?"
+            #     values = (put_data["total"], str(animal_number))
+            #     db.to_commit(query, values)
+            #
+            #     response["total"] = "The total updated successfully"
+            #     response["status_code"] = 200
+                return response
+
+
+# route to view single foster product using product ID
+@app.route('/view-foster/<int:foster_number>/', methods=["GET"])
+def view_foster(foster_number):
+    response = {}
+    db = Database()
+    query = ("SELECT * FROM foster WHERE foster_number=" + str(foster_number))
+    db.single_commit(query)
+    response["status_code"] = 200
+    response["message_description"] = "Foster animal retrieved successfully"
+    response["data"] = db.fetch_one()
+    return response
+
+
+# route to show all foster products
+@app.route('/show-foster/', methods=["GET"])
+def show_foster():
+    response = {}
+    db = Database()
+    query = "SELECT * FROM foster"
+    db.single_commit(query)
+    fosters = db.fetch_all()
+
+    response['status_code'] = 200
+    response['data'] = fosters
+    return response
+
+
+# calling function to show all foster products
+all_foster = show_foster()
 
 
 if __name__ == "__main__":
