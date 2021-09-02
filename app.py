@@ -688,12 +688,12 @@ def edit_animal(animal_number):
 
 # route to view single profile
 @app.route('/view-profile/<int:user_number>/', methods=["GET"])
-def view_profile(username):
+def view_profile(user_number):
     response = {}
     if request.method == "GET":
         with sqlite3.connect("adoption_centre.db") as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE username='" + username + "'")
+            cursor.execute("SELECT * FROM users WHERE user_number='" + user_number + "'")
             data = cursor.fetchall()
             if data == []:
                 return "User does not exit"
