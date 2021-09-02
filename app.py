@@ -693,7 +693,7 @@ def view_profile(user_number):
     if request.method == "GET":
         with sqlite3.connect("adoption_centre.db") as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE user_number='" + user_number + "'")
+            cursor.execute("SELECT * FROM users WHERE user_number=" + str(user_number))
             data = cursor.fetchall()
             if data == []:
                 return "User does not exit"
