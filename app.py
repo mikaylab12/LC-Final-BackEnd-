@@ -687,7 +687,7 @@ def edit_animal(animal_number):
 
 
 # route to view single profile
-@app.route('/view-profile/<username>/', methods=["GET"])
+@app.route('/view-profile/<int:user_number>/', methods=["GET"])
 def view_profile(username):
     response = {}
     if request.method == "GET":
