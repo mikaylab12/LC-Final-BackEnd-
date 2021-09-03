@@ -573,7 +573,7 @@ def add_animal():
         description = request.json['animal_description']
         image = request.json['animal_image']
         # total = int(price) * int(quantity)
-        if name == '' or price == '' or type == '' or breed == '' or age == '' or gender == ''or description == '' or image == '':
+        if name == '' or type == '' or breed == '' or age == '' or gender == '' or price == '' or description == '' or image == '':
             return "Please fill in all entry fields"
         else:
             query = "INSERT INTO animals (animal_name, animal_type, animal_breed, animal_age, animal_gender, " \
