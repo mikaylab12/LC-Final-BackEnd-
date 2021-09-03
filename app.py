@@ -273,188 +273,6 @@ def user_login():
         return "Wrong Method"
 
 
-# creating animals object
-class Animals(object):
-    def __init__(self, animal_number, animal_name, animal_type, animal_breed, animal_age, animal_gender, animal_price,
-                 animal_description, animal_image):
-        self.animal_number = animal_number
-        self.animal_name = animal_name
-        self.animal_type = animal_type
-        self.animal_breed = animal_breed
-        self.animal_age = animal_age
-        self.animal_gender = animal_gender
-        self.animal_price = animal_price
-        self.animal_description = animal_description
-        self.animal_image = animal_image
-
-
-# creating products table
-def init_animal_table():
-    db = Database()
-    query = ("CREATE TABLE IF NOT EXISTS animals "
-             "(animal_number INTEGER PRIMARY KEY AUTOINCREMENT, "
-             "animal_name TEXT NOT NULL, "
-             "animal_type TEXT NOT NULL, "
-             "animal_breed TEXT NOT NULL, "
-             "animal_age TEXT NOT NULL, "
-             "animal_gender TEXT NOT NULL, "
-             "animal_price TEXT NOT NULL, "
-             "animal_description TEXT NOT NULL, "
-             "animal_image TEXT NOT NULL)")
-    db.single_commit(query)
-    print("Animals table created successfully.")
-
-
-# calling function to create products table
-init_animal_table()
-
-
-# route to show all products
-@app.route('/show-animals/', methods=["GET"])
-def show_animals():
-    response = {}
-    db = Database()
-    query = "SELECT * FROM animals"
-    db.single_commit(query)
-    animals = db.fetch_all()
-
-    response['status_code'] = 200
-    response['data'] = animals
-    return response
-
-
-# calling function to show all products
-all_animals = show_animals()
-
-
-# creating a user object
-class Admin(object):
-    def __init__(self, id, username, password):
-        self.id = id
-        self.username = username
-        self.password = password
-
-
-# create admin table
-def init_admin_table():
-    conn = sqlite3.connect('adoption_centre.db')
-    cursor = conn.cursor()
-    print("Opened database successfully")
-    cursor.execute("CREATE TABLE IF NOT EXISTS admin "
-                   "(admin_number INTEGER PRIMARY KEY AUTOINCREMENT,"
-                   "admin_id TEXT NOT NULL,"
-                   "admin_name TEXT NOT NULL,"
-                   "admin_surname TEXT NOT NULL, "
-                   "admin_email TEXT NOT NULL, "
-                   "admin_contact TEXT NOT NULL, "
-                   "admin_username TEXT NOT NULL, "
-                   "admin_password TEXT NOT NULL)")
-    print("Admin table created successfully")
-    conn.close()
-
-
-# calling function to create users table
-init_admin_table()
-
-
-# fetching admin users from the admin table
-def fetch_admin():
-    db = Database()
-    query = "SELECT * FROM admin"
-    db.single_commit(query)
-    registered_admin = db.fetch_all()
-
-    new_data = []
-
-    for data in registered_admin:
-        new_data.append(User(data[0], data[6], data[7]))
-    return new_data
-
-
-# calling function to fetch all admin users
-all_admin = fetch_admin()
-
-
-admin_username_table = {u.username: u for u in all_admin}
-adminId_table = {u.id: u for u in all_admin}
-
-
-# route to register admin
-@app.route('/register-admin/', methods=["POST"])
-def admin_registration():
-    response = {}
-    db = Database()
-    try:
-        admin_id = request.form['admin_id']
-        first_name = request.form['admin_name']
-        last_name = request.form['admin_surname']
-        email = request.form['admin_email']
-        contact = request.form['admin_contact']
-        username = request.form['admin_username']
-        password = request.form['admin_password']
-
-        if int(len(contact)) > 10 or int(len(contact)) < 10:
-            response['message'] = "Please enter a valid phone number that consists of 10 digits."
-            response['status_code'] = 400
-            return response
-
-        if int(contact) == str:
-            response['message'] = "Please enter a phone number consisting of digits only."
-            response['status_code'] = 400
-            return response
-        else:
-            query = "INSERT INTO admin(admin_id, admin_name, admin_surname, admin_email, admin_contact, " \
-                    "admin_username, admin_password) VALUES(?, ?, ?, ?, ?, ?, ?)"
-            values = (admin_id, first_name, last_name, email, contact, username, password)
-            db.to_commit(query, values)
-
-            msg = Message('Welcome Email', sender='mikayladummy2@gmail.com', recipients=[email])
-            # message for the email
-            msg.body = "Hello " + str(username) + "!"\
-                       "\n\nThank you for registering as an Admin User! \n\nHave a lovely day further!"
-            mail.send(msg)
-
-            response["message"] = "Successful Registration"
-            response["status_code"] = 201
-            return response
-            # return redirect("https://beelders-store-js-eomp.netlify.app/templates/admin_complete.html")
-    except SMTPRecipientsRefused:
-        response['message'] = "Please enter a valid email address."
-        response['status_code'] = 400
-        return response
-    except ValueError:
-        response['message'] = "Please enter a valid phone number containing digits only."
-        response['status_code'] = 400
-        return response
-    except TypeError:
-        response['message'] = "Please enter a valid phone number containing digits only."
-        response['status_code'] = 400
-        return response
-
-
-@app.route('/login-admin/', methods=["POST"])
-def admin_login():
-    response = {}
-    db = Database()
-    if request.method == "POST":
-        username = request.json['admin_username']
-        password = request.json['admin_password']
-        conn = sqlite3.connect("adoption_centre.db")
-        cur = conn.cursor()
-        query = f"SELECT * FROM admin WHERE admin_username= '{username}' and admin_password = '{password}'"
-        db.single_commit(query)
-        if not cur.fetchone():
-            response['message'] = "Welcome Admin"
-            response['status_code'] = 200
-            return response
-        else:
-            response['message'] = "Please enter valid credentials."
-            response['status_code'] = 405
-            return response
-    else:
-        return "Wrong Method"
-
-
 # route to show all users
 @app.route('/show-users/', methods=["GET"])
 def show_users():
@@ -555,6 +373,77 @@ def delete_user(user_number):
     response['status_code'] = 200
     response['message'] = "User deleted successfully."
     return response
+
+
+# route to view single profile
+@app.route('/view-profile/<int:user_number>/', methods=["GET"])
+def view_profile(user_number):
+    response = {}
+    if request.method == "GET":
+        with sqlite3.connect("adoption_centre.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE user_number=" + str(user_number))
+            data = cursor.fetchall()
+            if data == []:
+                return "User does not exit"
+            else:
+                response['message'] = 200
+                response['data'] = data
+        return response
+
+
+# creating animals object
+class Animals(object):
+    def __init__(self, animal_number, animal_name, animal_type, animal_breed, animal_age, animal_gender, animal_price,
+                 animal_description, animal_image):
+        self.animal_number = animal_number
+        self.animal_name = animal_name
+        self.animal_type = animal_type
+        self.animal_breed = animal_breed
+        self.animal_age = animal_age
+        self.animal_gender = animal_gender
+        self.animal_price = animal_price
+        self.animal_description = animal_description
+        self.animal_image = animal_image
+
+
+# creating products table
+def init_animal_table():
+    db = Database()
+    query = ("CREATE TABLE IF NOT EXISTS animals "
+             "(animal_number INTEGER PRIMARY KEY AUTOINCREMENT, "
+             "animal_name TEXT NOT NULL, "
+             "animal_type TEXT NOT NULL, "
+             "animal_breed TEXT NOT NULL, "
+             "animal_age TEXT NOT NULL, "
+             "animal_gender TEXT NOT NULL, "
+             "animal_price TEXT NOT NULL, "
+             "animal_description TEXT NOT NULL, "
+             "animal_image TEXT NOT NULL)")
+    db.single_commit(query)
+    print("Animals table created successfully.")
+
+
+# calling function to create products table
+init_animal_table()
+
+
+# route to show all products
+@app.route('/show-animals/', methods=["GET"])
+def show_animals():
+    response = {}
+    db = Database()
+    query = "SELECT * FROM animals"
+    db.single_commit(query)
+    animals = db.fetch_all()
+
+    response['status_code'] = 200
+    response['data'] = animals
+    return response
+
+
+# calling function to show all products
+all_animals = show_animals()
 
 
 # route to add an animal
@@ -686,24 +575,7 @@ def edit_animal(animal_number):
                 return response
 
 
-# route to view single profile
-@app.route('/view-profile/<int:user_number>/', methods=["GET"])
-def view_profile(user_number):
-    response = {}
-    if request.method == "GET":
-        with sqlite3.connect("adoption_centre.db") as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE user_number=" + str(user_number))
-            data = cursor.fetchall()
-            if data == []:
-                return "User does not exit"
-            else:
-                response['message'] = 200
-                response['data'] = data
-        return response
-
-
-# route to view single existing product using product ID
+# route to view single existing product using animal's ID
 @app.route('/view-animal/<int:animal_number>/', methods=["GET"])
 def view_animal(animal_number):
     response = {}
@@ -714,6 +586,267 @@ def view_animal(animal_number):
     response["message_description"] = "Animal retrieved successfully"
     response["data"] = db.fetch_one()
     return response
+
+
+# creating a user object
+class Admin(object):
+    def __init__(self, id, username, password):
+        self.id = id
+        self.username = username
+        self.password = password
+
+
+# create admin table
+def init_admin_table():
+    conn = sqlite3.connect('adoption_centre.db')
+    cursor = conn.cursor()
+    print("Opened database successfully")
+    cursor.execute("CREATE TABLE IF NOT EXISTS admin "
+                   "(admin_number INTEGER PRIMARY KEY AUTOINCREMENT,"
+                   "admin_id TEXT NOT NULL,"
+                   "admin_name TEXT NOT NULL,"
+                   "admin_surname TEXT NOT NULL, "
+                   "admin_email TEXT NOT NULL, "
+                   "admin_contact TEXT NOT NULL, "
+                   "admin_username TEXT NOT NULL, "
+                   "admin_password TEXT NOT NULL)")
+    print("Admin table created successfully")
+    conn.close()
+
+
+# calling function to create users table
+init_admin_table()
+
+
+# fetching admin users from the admin table
+def fetch_admin():
+    db = Database()
+    query = "SELECT * FROM admin"
+    db.single_commit(query)
+    registered_admin = db.fetch_all()
+
+    new_data = []
+
+    for data in registered_admin:
+        new_data.append(User(data[0], data[6], data[7]))
+    return new_data
+
+
+# calling function to fetch all admin users
+all_admin = fetch_admin()
+
+
+admin_username_table = {u.username: u for u in all_admin}
+adminId_table = {u.id: u for u in all_admin}
+
+
+# route to register admin
+@app.route('/register-admin/', methods=["POST"])
+def admin_registration():
+    response = {}
+    db = Database()
+    try:
+        admin_id = request.form['admin_id']
+        first_name = request.form['admin_name']
+        last_name = request.form['admin_surname']
+        email = request.form['admin_email']
+        contact = request.form['admin_contact']
+        username = request.form['admin_username']
+        password = request.form['admin_password']
+
+        if int(len(contact)) > 10 or int(len(contact)) < 10:
+            response['message'] = "Please enter a valid phone number that consists of 10 digits."
+            response['status_code'] = 400
+            return response
+
+        if int(contact) == str:
+            response['message'] = "Please enter a phone number consisting of digits only."
+            response['status_code'] = 400
+            return response
+        else:
+            query = "INSERT INTO admin(admin_id, admin_name, admin_surname, admin_email, admin_contact, " \
+                    "admin_username, admin_password) VALUES(?, ?, ?, ?, ?, ?, ?)"
+            values = (admin_id, first_name, last_name, email, contact, username, password)
+            db.to_commit(query, values)
+
+            msg = Message('Welcome Email', sender='mikayladummy2@gmail.com', recipients=[email])
+            # message for the email
+            msg.body = "Hello " + str(username) + "!"\
+                       "\n\nThank you for registering as an Admin User! \n\nHave a lovely day further!"
+            mail.send(msg)
+
+            response["message"] = "Successful Registration"
+            response["status_code"] = 201
+            return response
+            # return redirect("https://beelders-store-js-eomp.netlify.app/templates/admin_complete.html")
+    except SMTPRecipientsRefused:
+        response['message'] = "Please enter a valid email address."
+        response['status_code'] = 400
+        return response
+    except ValueError:
+        response['message'] = "Please enter a valid phone number containing digits only."
+        response['status_code'] = 400
+        return response
+    except TypeError:
+        response['message'] = "Please enter a valid phone number containing digits only."
+        response['status_code'] = 400
+        return response
+
+
+@app.route('/login-admin/', methods=["POST"])
+def admin_login():
+    response = {}
+    db = Database()
+    if request.method == "POST":
+        username = request.json['admin_username']
+        password = request.json['admin_password']
+        conn = sqlite3.connect("adoption_centre.db")
+        cur = conn.cursor()
+        query = f"SELECT * FROM admin WHERE admin_username= '{username}' and admin_password = '{password}'"
+        db.single_commit(query)
+        if not cur.fetchone():
+            response['message'] = "Welcome Admin"
+            response['status_code'] = 200
+            return response
+        else:
+            response['message'] = "Please enter valid credentials."
+            response['status_code'] = 405
+            return response
+    else:
+        return "Wrong Method"
+
+
+# route to view single admin user using admin ID
+@app.route('/view-admin/<int:admin_number>/', methods=["GET"])
+def view_admin(admin_number):
+    response = {}
+    db = Database()
+    query = ("SELECT * FROM admin WHERE admin_number=" + str(admin_number))
+    db.single_commit(query)
+    response["status_code"] = 200
+    response["message_description"] = "Admin user retrieved successfully"
+    response["data"] = db.fetch_one()
+    return response
+
+
+# route to show all admin users
+@app.route('/show-admin/', methods=["GET"])
+def show_admin():
+    response = {}
+    db = Database()
+    query = "SELECT * FROM admin"
+    db.single_commit(query)
+    users = db.fetch_all()
+
+    response['status_code'] = 200
+    response['data'] = users
+    return response
+
+
+# calling function to show all products
+all_admin = show_admin()
+
+
+# route to edit user
+@app.route('/edit-admin/<int:admin_number>/', methods=["PUT"])
+# @jwt_required()
+def edit_admin(admin_number):
+    response = {}
+    db = Database()
+
+    if request.method == "PUT":
+        with sqlite3.connect('adoption_centre.db'):
+            data_receive = dict(request.json)
+            put_data = {}
+
+            if data_receive.get("admin_id") is not None:
+                put_data["admin_id"] = data_receive.get("admin_id")
+                query = "UPDATE admin SET admin_id =? WHERE admin_number=?"
+                values = (put_data["admin_id"], str(admin_number))
+                db.to_commit(query, values)
+
+                response['admin_id'] = "ID number update was successful."
+                response['status_code'] = 200
+            if data_receive.get("admin_name") is not None:
+                put_data["admin_name"] = data_receive.get("admin_name")
+                query = "UPDATE admin SET admin_name =? WHERE admin_number=?"
+                values = (put_data["admin_name"], str(admin_number))
+                db.to_commit(query, values)
+
+                response['admin_name'] = "First name update was successful."
+                response['status_code'] = 200
+            if data_receive.get("admin_surname") is not None:
+                put_data['admin_surname'] = data_receive.get('admin_surname')
+                query = "UPDATE admin SET admin_surname =? WHERE admin_number=?"
+                values = (put_data["admin_surname"], str(admin_number))
+                db.to_commit(query, values)
+
+                response["admin_surname"] = "Last name updated successfully"
+                response["status_code"] = 200
+            if data_receive.get("admin_email") is not None:
+                put_data['admin_email'] = data_receive.get('admin_email')
+                query = "UPDATE admin SET admin_email =? WHERE admin_number=?"
+                values = (put_data["admin_email"], str(admin_number))
+                db.to_commit(query, values)
+
+                response["admin_email"] = "Email address updated successfully"
+                response["status_code"] = 200
+            if data_receive.get("admin_contact") is not None:
+                put_data['admin_contact'] = data_receive.get('admin_contact')
+                query = "UPDATE admin SET admin_contact =? WHERE admin_number=?"
+                values = (put_data["admin_contact"], str(admin_number))
+                db.to_commit(query, values)
+
+                response["admin_contact"] = "Contact Number updated successfully"
+                response["status_code"] = 200
+            if data_receive.get("username") is not None:
+                put_data['admin_username'] = data_receive.get('admin_username')
+                query = "UPDATE admin SET admin_username =? WHERE admin_number=?"
+                values = (put_data["admin_username"], str(admin_number))
+                db.to_commit(query, values)
+
+                response["admin_username"] = "Username updated successfully"
+                response["status_code"] = 200
+            if data_receive.get("admin_password") is not None:
+                put_data['admin_password'] = data_receive.get('admin_password')
+                query = "UPDATE admin SET admin_password =? WHERE admin_number=?"
+                values = (put_data["admin_password"], str(admin_number))
+                db.to_commit(query, values)
+
+                response["admin_password"] = "Password updated successfully"
+                response["status_code"] = 200
+            return response
+
+
+# route to delete user
+@app.route("/delete-admin/<int:admin_number>")
+# @jwt_required()
+def delete_admin(admin_number):
+    response = {}
+    db = Database()
+    query = "DELETE FROM admin WHERE admin_number= ' " + str(admin_number) + " ' "
+    db.single_commit(query)
+    response['status_code'] = 200
+    response['message'] = "Admin user deleted successfully."
+    return response
+
+
+# # route to view single profile
+# @app.route('/view-profile/<int:user_number>/', methods=["GET"])
+# def view_profile(user_number):
+#     response = {}
+#     if request.method == "GET":
+#         with sqlite3.connect("adoption_centre.db") as conn:
+#             cursor = conn.cursor()
+#             cursor.execute("SELECT * FROM users WHERE user_number=" + str(user_number))
+#             data = cursor.fetchall()
+#             if data == []:
+#                 return "User does not exit"
+#             else:
+#                 response['message'] = 200
+#                 response['data'] = data
+#         return response
+
 
 
 class Foster(object):
