@@ -248,6 +248,11 @@ def registration():
         response['message'] = "Please enter a valid phone number containing digits only."
         response['status_code'] = 402
         return response
+    # Syntax Error for front end
+    except SyntaxError:
+        response['message'] = "Please enter a valid ID consisting of digits only."
+        response['status_code'] = 404
+        return response
 
 
 @app.route('/login/', methods=["POST"])
@@ -768,6 +773,11 @@ def admin_registration():
     except TypeError:
         response['message'] = "Please enter a valid phone number containing digits only."
         response['status_code'] = 402
+        return response
+    # Syntax Error for front end
+    except SyntaxError:
+        response['message'] = "Please enter a valid ID consisting of digits only."
+        response['status_code'] = 404
         return response
 
 
