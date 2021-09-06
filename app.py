@@ -696,21 +696,20 @@ def admin_registration():
 @app.route('/login-admin/', methods=["POST"])
 def admin_login():
     response = {}
-    db = Database()
     if request.method == "POST":
         username = request.json['admin_username']
         password = request.json['admin_password']
         conn = sqlite3.connect("adoption_centre.db")
         cur = conn.cursor()
         query = f"SELECT * FROM admin WHERE admin_username= '{username}' and admin_password = '{password}'"
-        db.single_commit(query)
+        cur.execute(query)
         if not cur.fetchone():
-            response['message'] = "Welcome Admin"
-            response['status_code'] = 200
+            response['message'] = "Please enter valid credentials."
+            response['status_code'] = 401
             return response
         else:
-            response['message'] = "Please enter valid credentials."
-            response['status_code'] = 405
+            response['message'] = "Welcome Admin"
+            response['status_code'] = 200
             return response
     else:
         return "Wrong Method"
