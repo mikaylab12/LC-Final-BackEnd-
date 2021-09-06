@@ -392,6 +392,45 @@ def view_profile(user_number):
         return response
 
 
+@app.route('/adopt-checkout/')
+def adopt_checkout():
+    response = {}
+    try:
+        email = request.json['email_address']
+        contact = request.json['contact_number']
+        username = request.json['username']
+        if email != "":
+            msg = Message('Adoption Confirmation', sender='mikayladummy2@gmail.com', recipients=[email])
+            # message for the email
+            msg.body = "Hello " + str(username) + "!" \
+                       "\n\nThank you for requesting to adopt one of our furry friends! " \
+                       "\n\nOur team will contact you on" + str(contact) + " within the next" \
+                       " 24 hours regarding the way forward. \n\nIf this contact number is " \
+                       "incorrect, please respond to this email."
+            mail.send(msg)
+
+            response["message"] = "Email sent successfully."
+            response["status_code"] = 201
+            return response
+        return redirect("https://beelders-store-js-eomp.netlify.app/templates/complete_register.html")
+        else:
+            response["message"] = "No valid email address given"
+            response["status_code"] = 401
+            return response
+    except SMTPRecipientsRefused:
+        response['message'] = "Please enter a valid email address."
+        response['status_code'] = 400
+        return response
+    except ValueError:
+        response['message'] = "Please enter a valid phone number containing digits only."
+        response['status_code'] = 400
+        return response
+    except TypeError:
+        response['message'] = "Please enter a valid phone number containing digits only."
+        response['status_code'] = 400
+        return response
+
+
 # creating animals object
 class Animals(object):
     def __init__(self, animal_number, animal_name, animal_type, animal_breed, animal_age, animal_gender, animal_price,
