@@ -392,7 +392,7 @@ def view_profile(user_number):
         return response
 
 
-@app.route('/adopt-checkout/')
+@app.route('/adopt-checkout/', methods=["POST"])
 def adopt_checkout():
     response = {}
     try:
@@ -412,7 +412,7 @@ def adopt_checkout():
             response["message"] = "Email sent successfully."
             response["status_code"] = 201
             return response
-        return redirect("https://beelders-store-js-eomp.netlify.app/templates/complete_register.html")
+        # return redirect("https://beelders-store-js-eomp.netlify.app/templates/complete_register.html")
         else:
             response["message"] = "No valid email address given"
             response["status_code"] = 401
