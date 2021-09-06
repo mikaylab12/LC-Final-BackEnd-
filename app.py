@@ -130,13 +130,13 @@ def registration():
     response = {}
     db = Database()
     try:
-        id_number = request.form['user_id']
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
-        email = request.form['email_address']
-        contact = request.form['contact_number']
-        username = request.form['username']
-        password = request.form['password']
+        id_number = request.json['user_id']
+        first_name = request.json['first_name']
+        last_name = request.json['last_name']
+        email = request.json['email_address']
+        contact = request.json['contact_number']
+        username = request.json['username']
+        password = request.json['password']
 
     # try:
 
@@ -724,13 +724,13 @@ def admin_registration():
     response = {}
     db = Database()
     try:
-        admin_id = request.form['admin_id']
-        first_name = request.form['admin_name']
-        last_name = request.form['admin_surname']
-        email = request.form['admin_email']
-        contact = request.form['admin_contact']
-        username = request.form['admin_username']
-        password = request.form['admin_password']
+        admin_id = request.json['admin_id']
+        first_name = request.json['admin_name']
+        last_name = request.json['admin_surname']
+        email = request.json['admin_email']
+        contact = request.json['admin_contact']
+        username = request.json['admin_username']
+        password = request.json['admin_password']
 
         if int(len(contact)) > 10 or int(len(contact)) < 10:
             response['message'] = "Please enter a valid phone number that consists of 10 digits."
