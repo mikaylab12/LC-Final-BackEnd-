@@ -253,21 +253,20 @@ def registration():
 @app.route('/login/', methods=["POST"])
 def user_login():
     response = {}
-    db = Database()
     if request.method == "POST":
         username = request.json['username']
         password = request.json['password']
         conn = sqlite3.connect("adoption_centre.db")
         cur = conn.cursor()
         query = f"SELECT * FROM users WHERE username= '{username}' and password = '{password}'"
-        db.single_commit(query)
+        cur.execute(query)
         if not cur.fetchone():
-            response['message'] = "Welcome '" + username + "'!"
-            response['status_code'] = 200
-            return response
-        else:
             response['message'] = "Please enter valid credentials."
             response['status_code'] = 400
+            return response
+        else:
+            response['message'] = "Welcome '" + username + "'!"
+            response['status_code'] = 200
             return response
     else:
         return "Wrong Method"
