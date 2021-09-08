@@ -137,83 +137,14 @@ def registration():
         contact = request.json['contact_number']
         username = request.json['username']
         password = request.json['password']
-
-    # try:
-
-        # else:
-        #     raise TypeError(
-        #         f"The view function for {request.endpoint!r} did not"
-        #         " return a valid response. The function either returned"
-        #         " None or ended without a return statement."
-        #     )
-
         if int(len(contact)) > 10 or int(len(contact)) < 10:
             response['message'] = "Please enter a valid phone number that consists of 10 digits."
             response['status_code'] = 400
             return response
-    # except ValueError:
-    #     response['message'] = "Please enter a phone number consisting of digits only."
-    #     response['status_code'] = 400
-
-    # try:
-    #     if request.method == 'POST':
-
-# def age_calc():
-    #     try:
-    #         # current date
-    #         # current_date = datetime.today()
-    #         # in order to validate id number entered
-    #         valid_id_number = rsaidnumber.parse(id_number)
-    #         valid_id = valid_id_number
-    #         while valid_id:
-    #             # dob = id_number.date_of_birth
-    #             # current_age = int((current_date - dob) // timedelta(days=365.25))
-    #             # if int(current_age) >= 18:
-    #             return 1
-    #         else:
-    #             response['message'] = "Please enter a valid id number."
-    #             response['status_code'] = 400
-    #             return response
-    #             # messagebox.showinfo("Underage", "You are too young to play.\nPlease try again in " + str(
-    #             #     18 - int(current_age)) + " years")
-    #     except ValueError:
-    #         response['message'] = "Please enter a valid SA Id number that consists of 13 digits."
-    #         response['status_code'] = 400
-    #         return response
-    #
-    # def email_validation():
-    #     try:
-    #         # validate email
-    #         valid = validate_email(email)
-    #         while valid:
-    #             return 1
-    #     except EmailNotValidError:
-    #         response['message'] = "Please enter a valid email address."
-    #         response['status_code'] = 400
-    #         return response
-    #         # messagebox.showinfo("Invalid Email Address", "\nPlease enter a valid email address.")
-    #
-    # def cell_num_validation():
-    #     try:
-    #         tel = contact
-    #         if int(len(tel)) == 10:
-    #             return 1
-    #         elif int(len(tel)) > 10:
-    #             response['message'] = "Please ensure that your cellphone contains 10 digits only."
-    #             response['status_code'] = 400
-    #             # messagebox.showinfo('Error', 'Please ensure that your cellphone number contains only 10 digits.')
-    #         elif int(len(tel)) < 10:
-    #             response['message'] = "Please note that you have entered less that 10 digits for your " \
-    #                                   "cellphone number."
-    #             response['status_code'] = 400
-    #             # messagebox.showinfo('Error', 'Please note that you have not entered 10 digits '
-    #             # 'for your contact number')
-    #     except ValueError:
-    #         response['message'] = "Please enter a valid cellphone umber consisting of digits only."
-    #         response['status_code'] = 400
-    #         # messagebox.showinfo('Error', 'Please enter a valid cellphone number that only consists of digits. ')
-    #
-    # if age_calc() == 1 and email_validation() == 1 and cell_num_validation() == 1 and request.method == "POST":
+        if int(len(id_number)) > 13 or int(len(id_number)) < 13:
+            response['message'] = "Please enter a valid ID number that consists of 13 digits."
+            response['status_code'] = 400
+            return response
         if int(contact) == str:
             response['message'] = "Please enter a phone number consisting of digits only."
             response['status_code'] = 400
@@ -247,11 +178,6 @@ def registration():
     except TypeError:
         response['message'] = "Please enter a valid phone number containing digits only."
         response['status_code'] = 402
-        return response
-    # Syntax Error for front end
-    except SyntaxError:
-        response['message'] = "Please enter a valid ID consisting of digits only."
-        response['status_code'] = 404
         return response
 
 
@@ -393,85 +319,6 @@ def view_profile(user_number):
             else:
                 response['message'] = 200
                 response['data'] = data
-        return response
-
-
-# function for checkout when adopting
-@app.route('/adopt-checkout/', methods=["POST"])
-def adopt_checkout():
-    response = {}
-    try:
-        email = request.json['email_address']
-        contact = request.json['contact_number']
-        username = request.json['username']
-        if email != "":
-            msg = Message('Adoption Confirmation', sender='mikayladummy2@gmail.com', recipients=[email])
-            # message for the email
-            msg.body = "Hello " + str(username) + "!" \
-                       "\n\nThank you for requesting to adopt one of our furry friends! " \
-                       "\n\nOur team will contact you on " + str(contact) + " within the next" \
-                       " 24 hours regarding the way forward and in order to arrange a time and date to link up for " \
-                       "inspection. \n\nIf this contact number is incorrect, please respond to this email."
-            mail.send(msg)
-
-            response["message"] = "Email sent successfully."
-            response["status_code"] = 201
-            return response
-        else:
-            response["message"] = "No valid email address given"
-            response["status_code"] = 401
-            return response
-    except SMTPRecipientsRefused:
-        response['message'] = "Please enter a valid email address."
-        response['status_code'] = 403
-        return response
-    except ValueError:
-        response['message'] = "Please enter a valid phone number containing digits only."
-        response['status_code'] = 400
-        return response
-    except TypeError:
-        response['message'] = "Please enter a valid phone number containing digits only."
-        response['status_code'] = 402
-        return response
-
-
-# function for checking out when fostering
-@app.route('/foster-checkout/', methods=["POST"])
-def foster_checkout():
-    response = {}
-    try:
-        email = request.json['email_address']
-        contact = request.json['contact_number']
-        username = request.json['username']
-        if email != "":
-            msg = Message('Foster Confirmation', sender='mikayladummy2@gmail.com', recipients=[email])
-            # message for the email
-            msg.body = "Hello " + str(username) + "!" \
-                       "\n\nThank you for requesting to foster one of our furry friends! " \
-                       "\n\nOur team will contact you on " + str(contact) + " within the next" \
-                       " 24 hours regarding the way forward and in order to arrange a time and date to link up for " \
-                       "inspection and further details. \n\nIf this contact number is incorrect, please respond to" \
-                                                                            " this email."
-            mail.send(msg)
-
-            response["message"] = "Email sent successfully."
-            response["status_code"] = 201
-            return response
-        else:
-            response["message"] = "No valid email address given"
-            response["status_code"] = 401
-            return response
-    except SMTPRecipientsRefused:
-        response['message'] = "Please enter a valid email address."
-        response['status_code'] = 403
-        return response
-    except ValueError:
-        response['message'] = "Please enter a valid phone number containing digits only."
-        response['status_code'] = 400
-        return response
-    except TypeError:
-        response['message'] = "Please enter a valid phone number containing digits only."
-        response['status_code'] = 402
         return response
 
 
@@ -671,6 +518,85 @@ def view_animal(animal_number):
     return response
 
 
+# function for checkout when adopting
+@app.route('/adopt-checkout/', methods=["POST"])
+def adopt_checkout():
+    response = {}
+    try:
+        email = request.json['email_address']
+        contact = request.json['contact_number']
+        username = request.json['username']
+        if email != "":
+            msg = Message('Adoption Confirmation', sender='mikayladummy2@gmail.com', recipients=[email])
+            # message for the email
+            msg.body = "Hello " + str(username) + "!" \
+                       "\n\nThank you for requesting to adopt one of our furry friends! " \
+                       "\n\nOur team will contact you on " + str(contact) + " within the next" \
+                       " 24 hours regarding the way forward and in order to arrange a time and date to link up for " \
+                       "inspection. \n\nIf this contact number is incorrect, please respond to this email."
+            mail.send(msg)
+
+            response["message"] = "Email sent successfully."
+            response["status_code"] = 201
+            return response
+        else:
+            response["message"] = "No valid email address given"
+            response["status_code"] = 401
+            return response
+    except SMTPRecipientsRefused:
+        response['message'] = "Please enter a valid email address."
+        response['status_code'] = 403
+        return response
+    except ValueError:
+        response['message'] = "Please enter a valid phone number containing digits only."
+        response['status_code'] = 400
+        return response
+    except TypeError:
+        response['message'] = "Please enter a valid phone number containing digits only."
+        response['status_code'] = 402
+        return response
+
+
+# function for checking out when fostering
+@app.route('/foster-checkout/', methods=["POST"])
+def foster_checkout():
+    response = {}
+    try:
+        email = request.json['email_address']
+        contact = request.json['contact_number']
+        username = request.json['username']
+        if email != "":
+            msg = Message('Foster Confirmation', sender='mikayladummy2@gmail.com', recipients=[email])
+            # message for the email
+            msg.body = "Hello " + str(username) + "!" \
+                       "\n\nThank you for requesting to foster one of our furry friends! " \
+                       "\n\nOur team will contact you on " + str(contact) + " within the next" \
+                       " 24 hours regarding the way forward and in order to arrange a time and date to link up for " \
+                       "inspection and further details. \n\nIf this contact number is incorrect, please respond to" \
+                                                                            " this email."
+            mail.send(msg)
+
+            response["message"] = "Email sent successfully."
+            response["status_code"] = 201
+            return response
+        else:
+            response["message"] = "No valid email address given"
+            response["status_code"] = 401
+            return response
+    except SMTPRecipientsRefused:
+        response['message'] = "Please enter a valid email address."
+        response['status_code'] = 403
+        return response
+    except ValueError:
+        response['message'] = "Please enter a valid phone number containing digits only."
+        response['status_code'] = 400
+        return response
+    except TypeError:
+        response['message'] = "Please enter a valid phone number containing digits only."
+        response['status_code'] = 402
+        return response
+
+
 # creating a user object
 class Admin(object):
     def __init__(self, id, username, password):
@@ -741,6 +667,11 @@ def admin_registration():
             response['message'] = "Please enter a valid phone number that consists of 10 digits."
             response['status_code'] = 400
             return response
+
+        # if int(admin_id) == str:
+        #     response['message'] = "Please enter a valid ID number that consists of 13 digits."
+        #     response['status_code'] = 400
+        #     return response
 
         if int(contact) == str:
             response['message'] = "Please enter a phone number consisting of digits only."
