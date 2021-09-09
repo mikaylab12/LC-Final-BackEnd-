@@ -322,6 +322,24 @@ def view_profile(user_number):
         return response
 
 
+# route to view single profile
+@app.route('/user-profile/<username>/<password>', methods=["PATCH"])
+def user_profile(username, password):
+    response = {}
+    if request.method == "PATCH":
+        with sqlite3.connect("adoption_centre.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE username=" + str(username) + "password =" + str(password))
+            data = cursor.fetchall()
+            if data == []:
+                return "User does not exit"
+            else:
+                response['message'] = 200
+                response['data'] = data
+        return response
+
+
+
 # creating an animals object
 class Animals(object):
     def __init__(self, animal_number, animal_name, animal_type, animal_breed, animal_age, animal_gender, animal_price,
