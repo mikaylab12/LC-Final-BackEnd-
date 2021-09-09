@@ -329,7 +329,7 @@ def user_profile(username, password):
     if request.method == "PATCH":
         with sqlite3.connect("adoption_centre.db") as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE username=" + str(username) + "password =" + str(password))
+            cursor.execute("SELECT * FROM users WHERE username=" + str(username) + " and password =" + str(password))
             data = cursor.fetchall()
             if data == []:
                 return "User does not exit"
