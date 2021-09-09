@@ -339,7 +339,6 @@ def user_profile(username, password):
         return response
 
 
-
 # creating an animals object
 class Animals(object):
     def __init__(self, animal_number, animal_name, animal_type, animal_breed, animal_age, animal_gender, animal_price,
