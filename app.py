@@ -322,7 +322,7 @@ def view_profile(user_number):
         return response
 
 
-# route to view single profile
+# route to view single profile using username and password
 @app.route('/user-profile/<username>/<password>', methods=["PATCH"])
 def user_profile(username, password):
     response = {}
