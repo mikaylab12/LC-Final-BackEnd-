@@ -309,7 +309,7 @@ def delete_user(user_number):
     return response
 
 
-# route to view single profile
+# route to view single profile using user number
 @app.route('/view-profile/<int:user_number>/', methods=["GET"])
 def view_profile(user_number):
     response = {}
@@ -335,7 +335,7 @@ def user_profile(username, password):
         with sqlite3.connect("adoption_centre.db") as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM users WHERE username='" + str(username) + "' "
-                            "and password ='" + str(password) + "'")
+                           "and password ='" + str(password) + "'")
             data = cursor.fetchall()
             if data == []:
                 return "User does not exit"
@@ -470,6 +470,7 @@ def edit_animal(animal_number):
 
                 response["animal_type"] = "Animal type updated successfully"
                 response["status_code"] = 200
+            # edit animal's breed
             if data_received.get("animal_breed") is not None:
                 put_data['animal_breed'] = data_received.get('animal_breed')
                 query = "UPDATE animals SET animal_breed =? WHERE animal_number=?"
@@ -478,7 +479,7 @@ def edit_animal(animal_number):
 
                 response["animal_breed"] = "Animal breed updated successfully"
                 response["status_code"] = 200
-            # edit animal's breed
+            # edit animal's age
             if data_received.get("animal_age") is not None:
                 put_data["animal_age"] = data_received.get("animal_age")
                 query = "UPDATE animals SET animal_age =? WHERE animal_number=?"
