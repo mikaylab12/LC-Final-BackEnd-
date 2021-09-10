@@ -317,8 +317,9 @@ def view_profile(user_number):
             if data == []:
                 return "User does not exit"
             else:
-                response['message'] = 200
+                response['message'] = "User retrieved successfully"
                 response['data'] = data
+                response['status_code'] = 200
         return response
 
 
@@ -329,13 +330,15 @@ def user_profile(username, password):
     if request.method == "PATCH":
         with sqlite3.connect("adoption_centre.db") as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE username=" + str(username) + " and password =" + str(password))
+            cursor.execute("SELECT * FROM users WHERE username='" + str(username) + "' "
+                            "and password ='" + str(password) + "'")
             data = cursor.fetchall()
             if data == []:
                 return "User does not exit"
             else:
-                response['message'] = 200
+                response['message'] = "User retrieved successfully"
                 response['data'] = data
+                response['status_code'] = 200
         return response
 
 
