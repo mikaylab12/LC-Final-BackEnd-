@@ -53,7 +53,7 @@ def init_user_table():
                    "last_name TEXT NOT NULL, "
                    "email_address TEXT NOT NULL, "
                    "contact_number TEXT NOT NULL, "
-                   "username TEXT NOT NULL, "
+                   "username TEXT unique, "
                    "password TEXT NOT NULL)")
     print("Users table created successfully")
     conn.close()
@@ -173,6 +173,10 @@ def registration():
     except TypeError:
         response['message'] = "Please enter a valid phone number containing digits only."
         response['status_code'] = 402
+        return response
+    except sqlite3.IntegrityError:
+        response['message'] = "Username already exists"
+        response['status_code'] = 404
         return response
 
 
@@ -543,14 +547,21 @@ def adopt_checkout():
         email = request.json['email_address']
         contact = request.json['contact_number']
         username = request.json['username']
+        animal_name = request.json['animal_name']
+        animal_breed = request.json['animal_breed']
+        animal_type = request.json['animal_type']
+        animal_price = request.json['animal_price']
         if email != "":
             msg = Message('Adoption Confirmation', sender='mikayladummy2@gmail.com', recipients=[email])
             # message for the email
             msg.body = "Hello " + str(username) + "!" \
-                       "\n\nThank you for requesting to adopt one of our furry friends! " \
-                       "\n\nOur team will contact you on " + str(contact) + " within the next" \
-                       " 24 hours regarding the way forward and in order to arrange a time and date to link up for " \
-                       "inspection. \n\nIf this contact number is incorrect, please respond to this email."
+                       "\n\nThank you for requesting to adopt " + str(animal_name) + "!"\
+                       "\n\n" + str(animal_name) + "'s details are as follows: " \
+                       "\n Animal type: " + str(animal_type) + "\nAnimal breed: " + str(animal_breed) + "" \
+                       "\nPrice: R" + str(animal_price) + ""\
+                       "\n\nOur team will contact you on " + str(contact) + " within the next " \
+                       "24 hours regarding the way forward, payment method as well as to arrange a time and date to " \
+                       "link up for inspection. \n\nIf this contact number is incorrect, please respond to this email."
             mail.send(msg)
 
             response["message"] = "Email sent successfully."
@@ -594,7 +605,7 @@ def init_admin_table():
                    "admin_surname TEXT NOT NULL, "
                    "admin_email TEXT NOT NULL, "
                    "admin_contact TEXT NOT NULL, "
-                   "admin_username TEXT NOT NULL, "
+                   "admin_username TEXT unique, "
                    "admin_password TEXT NOT NULL)")
     print("Admin table created successfully")
     conn.close()
@@ -674,6 +685,10 @@ def admin_registration():
     except TypeError:
         response['message'] = "Please enter a valid phone number containing digits only."
         response['status_code'] = 402
+        return response
+    except sqlite3.IntegrityError:
+        response['message'] = "Username already exists"
+        response['status_code'] = 404
         return response
 
 
@@ -1010,13 +1025,18 @@ def foster_checkout():
         email = request.json['email_address']
         contact = request.json['contact_number']
         username = request.json['username']
+        animal_name = request.json['animal_name']
+        animal_breed = request.json['animal_breed']
+        animal_type = request.json['animal_type']
         if email != "":
             msg = Message('Foster Confirmation', sender='mikayladummy2@gmail.com', recipients=[email])
             # message for the email
             msg.body = "Hello " + str(username) + "!" \
-                       "\n\nThank you for requesting to foster one of our furry friends! " \
+                       "\n\nThank you for requesting to foster " + str(animal_name) + "!"\
+                       "\n\n" + str(animal_name) + "'s details are as follows: " \
+                       "\n Animal type: " + str(animal_type) + "\nAnimal breed: " + str(animal_breed) + "" \
                        "\n\nOur team will contact you on " + str(contact) + " within the next" \
-                       " 24 hours regarding the way forward and in order to arrange a time and date to link up for " \
+                       " 24 hours regarding the way forward as well as to arrange a time and date to link up for " \
                        "inspection and further details. \n\nIf this contact number is incorrect, please respond to" \
                                                                             " this email."
             mail.send(msg)
