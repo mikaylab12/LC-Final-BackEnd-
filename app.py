@@ -547,18 +547,13 @@ def adopt_checkout():
         email = request.json['email_address']
         contact = request.json['contact_number']
         username = request.json['username']
-        animal_name = request.json['animal_name']
-        animal_breed = request.json['animal_breed']
-        animal_type = request.json['animal_type']
-        animal_price = request.json['animal_price']
+        total_price = request.json['total_price']
         if email != "":
             msg = Message('Adoption Confirmation', sender='mikayladummy2@gmail.com', recipients=[email])
             # message for the email
             msg.body = "Hello " + str(username) + "!" \
-                       "\n\nThank you for requesting to adopt " + str(animal_name) + "!"\
-                       "\n\n" + str(animal_name) + "'s details are as follows: " \
-                       "\n Animal type: " + str(animal_type) + "\nAnimal breed: " + str(animal_breed) + "" \
-                       "\nPrice: R" + str(animal_price) + ""\
+                       "\n\nThank you for requesting to adopt our furry friends!"\
+                       "\n\nPlease note that the total price for your adoption is R" + str(total_price) + ""\
                        "\n\nOur team will contact you on " + str(contact) + " within the next " \
                        "24 hours regarding the way forward, payment method as well as to arrange a time and date to " \
                        "link up for inspection. \n\nIf this contact number is incorrect, please respond to this email."
@@ -1028,6 +1023,7 @@ def foster_checkout():
         animal_name = request.json['animal_name']
         animal_breed = request.json['animal_breed']
         animal_type = request.json['animal_type']
+        animal_age = request.json['animal_age']
         if email != "":
             msg = Message('Foster Confirmation', sender='mikayladummy2@gmail.com', recipients=[email])
             # message for the email
@@ -1035,10 +1031,10 @@ def foster_checkout():
                        "\n\nThank you for requesting to foster " + str(animal_name) + "!"\
                        "\n\n" + str(animal_name) + "'s details are as follows: " \
                        "\n Animal type: " + str(animal_type) + "\nAnimal breed: " + str(animal_breed) + "" \
-                       "\n\nOur team will contact you on " + str(contact) + " within the next" \
-                       " 24 hours regarding the way forward as well as to arrange a time and date to link up for " \
-                       "inspection and further details. \n\nIf this contact number is incorrect, please respond to" \
-                                                                            " this email."
+                       "\nAge: " + str(animal_age) + " Old\n\nOur team will contact you on " + str(contact) + "" \
+                       " within the next 24 hours regarding the way forward as well as to arrange a time and date to " \
+                       "link up for inspection and further details. \n\nIf this contact number is incorrect, please" \
+                       " respond to this email."
             mail.send(msg)
 
             response["message"] = "Email sent successfully."
