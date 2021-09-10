@@ -553,7 +553,7 @@ def adopt_checkout():
             # message for the email
             msg.body = "Hello " + str(username) + "!" \
                        "\n\nThank you for requesting to adopt our furry friends!"\
-                       "\n\nPlease note that the total price for your adoption is R" + str(total_price) + ""\
+                       "\n\nPlease note that the total price for your adoption is R " + str(total_price) + ""\
                        "\n\nOur team will contact you on " + str(contact) + " within the next " \
                        "24 hours regarding the way forward, payment method as well as to arrange a time and date to " \
                        "link up for inspection. \n\nIf this contact number is incorrect, please respond to this email."
